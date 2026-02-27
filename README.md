@@ -99,7 +99,7 @@ Alternatively, use the `Clear.bat` script to remove build artifacts before a cle
 
 ## Contributing
 
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+This project is no longer actively maintained. See [CONTRIBUTING.md](CONTRIBUTING.md) for historical build information.
 
 ## License
 
