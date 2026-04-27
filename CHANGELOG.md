@@ -18,7 +18,11 @@ Exceptions are acceptable depending on the circumstances (critical bug fixes tha
 
 ### Added
 
+- created `CLAUDE.md` with project architecture, build steps, and conventions for Claude Code sessions
+
 ### Changed
+
+- refreshed `.github/copilot-instructions.md` repository structure to include `CHANGELOG.md` and `SpeedHack/Clear.bat`
 
 ### Removed
 
