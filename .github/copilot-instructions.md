@@ -36,6 +36,7 @@ pinball-trainer-plus/
 ├── UPTP.pas                       # Main form unit — trainer logic, memory R/W, DLL injection
 ├── UPTP.dfm                       # Main form visual layout (Delphi Form Designer file)
 ├── SpeedHack/
+│   ├── Clear.bat                  # Cleanup script for SpeedHack build artifacts
 │   ├── SpeedHack.dpr              # Speed hack DLL project file
 │   ├── SpeedHack.res              # DLL compiled resources
 │   └── USpeedHack.pas             # Speed hack implementation (API hooking, timing override)
@@ -44,6 +45,7 @@ pinball-trainer-plus/
 │   └── Installer.res              # Embedded Pinball installer resource
 ├── Imgs/
 │   └── Icon.ico                   # Application icon
+├── CHANGELOG.md
 ├── Clear.bat                       # Cleanup script for Delphi build artifacts
 ├── CONTRIBUTING.md
 ├── LICENSE
