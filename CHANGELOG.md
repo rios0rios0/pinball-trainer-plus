@@ -16,6 +16,8 @@ Exceptions are acceptable depending on the circumstances (critical bug fixes tha
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-04-28
+
 ### Added
 
 - created `CLAUDE.md` with project architecture, build steps, and conventions for Claude Code sessions
@@ -23,9 +25,6 @@ Exceptions are acceptable depending on the circumstances (critical bug fixes tha
 ### Changed
 
 - refreshed `.github/copilot-instructions.md` repository structure to include `CHANGELOG.md` and `SpeedHack/Clear.bat`
-
-### Removed
-
 
 ## [1.0.0] - 2019-01-09
 
