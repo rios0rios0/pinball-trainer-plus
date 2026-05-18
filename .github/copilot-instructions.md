@@ -23,14 +23,18 @@ There is no automated build system or package manager. Builds are done manually 
 
 Run `Clear.bat` to remove all Delphi build artifacts (`.obj`, `.dcu`, `.exe`, etc.) before a clean rebuild.
 
-There is no CI/CD pipeline and no automated test suite.
+There is no automated test suite. CI handles release tagging only (`.github/workflows/release.yaml`).
 
 ## Repository Structure
 
 ```
 pinball-trainer-plus/
 ├── .github/
-│   └── copilot-instructions.md   # This file
+│   ├── copilot-instructions.md    # This file
+│   └── workflows/
+│       └── release.yaml           # Release tagging CI workflow
+├── .gitignore
+├── CLAUDE.md                      # Claude Code guidance
 ├── PTP.dpr                        # Main application entry point (Delphi project file)
 ├── PTP.res                        # Compiled project resources
 ├── UPTP.pas                       # Main form unit — trainer logic, memory R/W, DLL injection
@@ -57,9 +61,9 @@ pinball-trainer-plus/
 | File | Purpose |
 |---|---|
 | `UPTP.pas` | All trainer logic: process detection, memory read/write, DLL injection, UI event handlers, freeze timers |
-| `USpeedHack.pas` | Speed hack DLL: inline x86 JMP patching of `GetTickCount`, `timeGetTime`, `QueryPerformanceCounter` |
+| `USpeedHack.pas` | Unused alternative speed hack implementation (not referenced by either project) |
 | `PTP.dpr` | Application entry point; references `UPTP` and links resources |
-| `SpeedHack/SpeedHack.dpr` | DLL entry point |
+| `SpeedHack/SpeedHack.dpr` | Speed hack DLL: full implementation including API hooking via inline x86 JMP patching, trainer IPC, and timing loop |
 | `UPTP.dfm` | Delphi form layout — edit in the Delphi IDE form designer |
 
 ## Technology Stack
@@ -87,13 +91,13 @@ The entire trainer is implemented as a single VCL form class `TFrmPTPPrincipal`.
 - **DLL injection** — `InjectDll()` extracts `SpeedHack.dll` from embedded resources via `CreateResource()`, allocates memory in the target process with `VirtualAllocEx`, writes the DLL path with `WriteProcessMemory`, and creates a remote thread that calls `LoadLibraryA`.
 - **Trainer–DLL communication** — After injection, the DLL finds the trainer's window (`TFrmPTPPrincipal`) and reads three variables from the trainer's own process memory at fixed offsets: `SpeedHackSpeed` (acceleration multiplier), `SpeedHackSleep` (thread sleep interval), `SpeedHackActiv` (active flag).
 
-### Speed Hack DLL (`USpeedHack.pas`)
+### Speed Hack DLL (`SpeedHack.dpr`)
 
 The DLL patches three Windows timing functions in-process:
 
 1. Saves the original first 5 bytes of `GetTickCount`, `timeGetTime`, and `QueryPerformanceCounter`
 2. Overwrites the first 5 bytes with an `E9` (JMP) instruction redirecting to custom replacements
-3. A high-priority background thread increments a virtual tick counter using the configured multiplier
+3. A background thread increments a virtual tick counter using the configured multiplier
 4. Hooked functions return the virtual tick value instead of real system time, causing the game to run faster or slower
 
 ### Key Memory Addresses

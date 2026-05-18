@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Pinball Trainer Plus is a discontinued (2013) game trainer for 3D Pinball for Windows - Space Cadet. Built with Object Pascal in Borland Delphi 7. No automated builds, tests, or CI.
+Pinball Trainer Plus is a discontinued (2013) game trainer for 3D Pinball for Windows - Space Cadet. Built with Object Pascal in Borland Delphi 7. No automated builds or tests; CI handles release tagging only (`.github/workflows/release.yaml`).
 
 ## Build
 
@@ -17,7 +17,7 @@ Run `Clear.bat` (root) or `SpeedHack/Clear.bat` to remove build artifacts.
 
 ## Architecture
 
-Single-form VCL app (`UPTP.pas`) + injected DLL (`SpeedHack/USpeedHack.pas`).
+Single-form VCL app (`UPTP.pas`) + injected DLL (`SpeedHack/SpeedHack.dpr`).
 
 - **Process detection** — polls for `pinball.exe` via `CreateToolHelp32SnapShot`; finds window by class `1c7c22a0-9576-11ce-bf80-444553540000`
 - **Memory R/W** — `ReadProcessMemory`/`WriteProcessMemory` with pointer chains (base `$01025040`)
