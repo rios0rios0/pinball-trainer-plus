@@ -16,6 +16,8 @@ Exceptions are acceptable depending on the circumstances (critical bug fixes tha
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-05-19
+
 ### Changed
 
 - refreshed `CLAUDE.md` and `.github/copilot-instructions.md` to correct DLL source file reference (`SpeedHack.dpr` not `USpeedHack.pas`), acknowledge `release.yaml` CI workflow, and update repository structure
