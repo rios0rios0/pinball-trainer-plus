@@ -165,7 +165,7 @@ Because this project is discontinued, changes should be limited to documentation
 |---|---|
 | Change a memory address | Update the relevant constant in `UPTP.pas` and update the table in `README.md` |
 | Add a new freeze target | Add a new timer in the VCL form, hook it to `WriteMemoryBytes` calls |
-| Update the speed hack | Edit `USpeedHack.pas`, rebuild `SpeedHack.dpr`, re-embed the resulting DLL into `Resources/SpeedHack.res` |
+| Update the speed hack | Edit `SpeedHack/SpeedHack.dpr`, recompile it, re-embed the resulting DLL into `Resources/SpeedHack.res` |
 | Replace the bundled installer | Rebuild `Resources/Installer.res` from the new installer binary |
 | Remove build artifacts | Run `Clear.bat` |
 
