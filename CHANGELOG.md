@@ -16,6 +16,8 @@ Exceptions are acceptable depending on the circumstances (critical bug fixes tha
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-06-01
+
 ### Changed
 
 - refreshed `.github/copilot-instructions.md` to correct the speed-hack mechanism: the active `SpeedHack.dpr` applies its 5-byte `JMP` patches via direct pointer writes, not inline x86 assembly (which lives only in the unused `USpeedHack.pas`)
