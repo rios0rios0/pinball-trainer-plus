@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Pinball Trainer Plus** is a game trainer for **3D Pinball for Windows - Space Cadet** (`pinball.exe`). Built with Object Pascal in Borland Delphi 7, it reads and writes the game's process memory in real time to modify score, ball count, flipper force, cheat flags, and game speed. A companion DLL implements a speed hack by hooking three Windows timing APIs at runtime through inline x86 assembly code patching. Development was discontinued on 2013-03-28 and the repository is preserved as a historical reference.
+**Pinball Trainer Plus** is a game trainer for **3D Pinball for Windows - Space Cadet** (`pinball.exe`). Built with Object Pascal in Borland Delphi 7, it reads and writes the game's process memory in real time to modify score, ball count, flipper force, cheat flags, and game speed. A companion DLL implements a speed hack by hooking three Windows timing APIs at runtime, patching the first 5 bytes of each with a `JMP` to custom replacement functions. Development was discontinued on 2013-03-28 and the repository is preserved as a historical reference.
 
 **ALWAYS** reference these instructions first and fall back to searching or reading source files only when you encounter information that does not match what is documented here.
 
@@ -61,9 +61,9 @@ pinball-trainer-plus/
 | File | Purpose |
 |---|---|
 | `UPTP.pas` | All trainer logic: process detection, memory read/write, DLL injection, UI event handlers, freeze timers |
-| `USpeedHack.pas` | Unused alternative speed hack implementation (not referenced by either project) |
+| `USpeedHack.pas` | Unused alternative speed hack implementation (the inline x86 `asm` variant; not referenced by either project) |
 | `PTP.dpr` | Application entry point; references `UPTP` and links resources |
-| `SpeedHack/SpeedHack.dpr` | Speed hack DLL: full implementation including API hooking via inline x86 JMP patching, trainer IPC, and timing loop |
+| `SpeedHack/SpeedHack.dpr` | Speed hack DLL: full implementation including API hooking via 5-byte `JMP` patches (direct pointer writes, no inline asm), trainer IPC, and timing loop |
 | `UPTP.dfm` | Delphi form layout — edit in the Delphi IDE form designer |
 
 ## Technology Stack
@@ -74,7 +74,7 @@ pinball-trainer-plus/
 | UI Framework | VCL (Visual Component Library) |
 | UI Skinning | AlphaControls component suite (`sSkinManager`, `sTrackBar`, `sCheckBox`, etc.) |
 | Windows API | `ReadProcessMemory`, `WriteProcessMemory`, `OpenProcess`, `CreateRemoteThread`, `VirtualAllocEx`, `CreateToolHelp32SnapShot` |
-| Low-level | x86 inline assembly (`asm … end`) for 5-byte JMP patches |
+| Low-level | Runtime code patching — first 5 bytes of each hooked API overwritten with a `JMP` (`$E9`) via direct pointer writes |
 | DLL injection | `LoadLibraryA` called via `CreateRemoteThread` in the target process |
 | Embedded resources | Delphi `{$R …}` directives to bundle `SpeedHack.dll` and the Pinball installer |
 | Target platform | Windows XP/7, 32-bit |
