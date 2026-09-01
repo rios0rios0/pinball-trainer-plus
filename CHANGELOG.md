@@ -22,6 +22,12 @@ Exceptions are acceptable depending on the circumstances (critical bug fixes tha
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-09-01
+
+### Changed
+
+- refreshed `CLAUDE.md` and `.github/copilot-instructions.md` to reflect that CI now also runs the `claude-review.yaml` and `claude-mention.yaml` workflows, not release tagging alone, and updated the Copilot repository-structure tree to include the `.github/skills/code-review/SKILL.md` skill and the two Claude workflows
+
 ## [1.3.0] - 2026-08-28
 
 ### Added
