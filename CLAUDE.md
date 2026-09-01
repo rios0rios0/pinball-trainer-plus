@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Pinball Trainer Plus is a discontinued (2013) game trainer for 3D Pinball for Windows - Space Cadet. Built with Object Pascal in Borland Delphi 7. No automated builds or tests; CI handles release tagging only (`.github/workflows/release.yaml`).
+Pinball Trainer Plus is a discontinued (2013) game trainer for 3D Pinball for Windows - Space Cadet. Built with Object Pascal in Borland Delphi 7. No automated builds or tests. CI in `.github/workflows/` delegates to `rios0rios0/pipelines`: `release.yaml` tags releases, while `claude-review.yaml` and `claude-mention.yaml` run Claude PR review and `@claude` mention responses.
 
 ## Build
 

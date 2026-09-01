@@ -23,7 +23,7 @@ There is no automated build system or package manager. Builds are done manually 
 
 Run `Clear.bat` to remove all Delphi build artifacts (`.obj`, `.dcu`, `.exe`, etc.) before a clean rebuild.
 
-There is no automated test suite. CI handles release tagging only (`.github/workflows/release.yaml`).
+There is no automated test suite. CI in `.github/workflows/` delegates to `rios0rios0/pipelines`: `release.yaml` tags releases, and `claude-review.yaml` / `claude-mention.yaml` run Claude PR review and `@claude` mention responses.
 
 ## Repository Structure
 
@@ -31,8 +31,13 @@ There is no automated test suite. CI handles release tagging only (`.github/work
 pinball-trainer-plus/
 ├── .github/
 │   ├── copilot-instructions.md    # This file
+│   ├── skills/
+│   │   └── code-review/
+│   │       └── SKILL.md           # Copilot code-review skill tailored to this repo
 │   └── workflows/
-│       └── release.yaml           # Release tagging CI workflow
+│       ├── release.yaml           # Release tagging (delegates to rios0rios0/pipelines)
+│       ├── claude-review.yaml     # Claude automated PR review
+│       └── claude-mention.yaml    # @claude mention responder
 ├── .gitignore
 ├── CLAUDE.md                      # Claude Code guidance
 ├── PTP.dpr                        # Main application entry point (Delphi project file)
