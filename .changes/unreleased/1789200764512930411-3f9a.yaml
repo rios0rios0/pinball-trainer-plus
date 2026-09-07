@@ -1,0 +1,3 @@
+kind: 'Changed'
+body: 'refreshed `.github/copilot-instructions.md` and `.github/skills/code-review/SKILL.md` to correct the nonexistent `ReadMemoryBytes` helper reference and the secret-hygiene fixture wording'
+time: '2026-09-07T12:14:44.512930411Z'

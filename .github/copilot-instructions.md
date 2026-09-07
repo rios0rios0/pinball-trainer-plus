@@ -91,7 +91,7 @@ pinball-trainer-plus/
 The entire trainer is implemented as a single VCL form class `TFrmPTPPrincipal`. Key responsibilities:
 
 - **Process detection** — `GetProcessIDbyName()` uses `CreateToolHelp32SnapShot` to find a running `pinball.exe` and also locates its window by class name `1c7c22a0-9576-11ce-bf80-444553540000`. A polling timer (`TmrAtualiza`) enables/disables all UI controls based on detection status.
-- **Memory read/write** — `ReadMemoryBytes()` / `WriteMemoryBytes()` wrap `ReadProcessMemory` / `WriteProcessMemory`. Pointer chains are followed by reading a base address and adding a fixed offset (e.g. score: base `$01025040` + offset `$52`).
+- **Memory read/write** — `WriteMemoryBytes()` wraps the read-base / add-offset / `WriteProcessMemory` sequence; there is no `ReadMemoryBytes` helper — reads for display are done inline with `ReadProcessMemory` in `TmrAtualizaTimer`. Pointer chains are followed by reading a base address and adding a fixed offset (e.g. score: base `$01025040` + offset `$52`).
 - **Freeze timers** — `TmrFreezePontos` and `TmrFreezeBolas` continuously rewrite the desired score/ball-count values to prevent the game from changing them.
 - **DLL injection** — `InjectDll()` extracts `SpeedHack.dll` from embedded resources via `CreateResource()`, allocates memory in the target process with `VirtualAllocEx`, writes the DLL path with `WriteProcessMemory`, and creates a remote thread that calls `LoadLibraryA`.
 - **Trainer–DLL communication** — After injection, the DLL finds the trainer's window (`TFrmPTPPrincipal`) and reads three variables from the trainer's own process memory at fixed offsets: `SpeedHackSpeed` (acceleration multiplier), `SpeedHackSleep` (thread sleep interval), `SpeedHackActiv` (active flag).
