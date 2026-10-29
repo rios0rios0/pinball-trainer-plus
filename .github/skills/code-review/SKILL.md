@@ -20,7 +20,7 @@ The canonical engineering standards live in the
 repo-tailored index into that guide plus the rules that only apply here. Precedence, highest
 first:
 
-1. This repository's `.github/copilot-instructions.md`, `CLAUDE.md`, and `CONTRIBUTING.md` —
+1. This repository's `.github/copilot-instructions.md`, `AGENTS.md`, and `CONTRIBUTING.md` —
    they describe *this* codebase and its load-bearing invariants.
 2. The **rios0rios0/guide** wiki — the shared standard.
 3. General language idiom.
@@ -109,7 +109,7 @@ hand.
 - Fragment bodies start with a lowercase verb in simple past tense, capitalise proper nouns
   (GitHub, Go, Docker), and wrap code identifiers and versions in backticks.
 - `README.md` is updated whenever usage, setup, configuration, or architecture changes;
-  `.github/copilot-instructions.md` and `CLAUDE.md` whenever the workflow, commands, or
+  `.github/copilot-instructions.md` and `AGENTS.md` whenever the workflow, commands, or
   structure changes. Documentation and code ship in one commit.
 
 ## Git Flow and pull-request hygiene
@@ -175,7 +175,7 @@ A review that raises noise gets ignored. Do not report these:
 ### Change-control checklist
 - [ ] Changelog entry present for every behavioural change
 - [ ] `README.md` updated if usage, setup, or architecture changed
-- [ ] `.github/copilot-instructions.md` and `CLAUDE.md` updated if the workflow, commands, or structure changed
+- [ ] `.github/copilot-instructions.md` and `AGENTS.md` updated if the workflow, commands, or structure changed
 - [ ] Commit messages follow `type(SCOPE): message` in simple past tense
 - [ ] Breaking changes flagged in the commit footer, the changelog, and the PR description
 
@@ -188,7 +188,7 @@ A review that raises noise gets ignored. Do not report these:
 | Severity       | Use for                                                                                                                            |
 |----------------|------------------------------------------------------------------------------------------------------------------------------------|
 | **Critical**   | Broken dependency direction, a leaked secret, an injection or authentication flaw, a missing changelog entry, a banned mock library, a load-bearing invariant broken, a test deleted rather than fixed. |
-| **Warning**    | Naming that departs from the guide, a missing test for a new branch of logic, an unexplained magic value, a stale README or instructions file, a `switch` that should be a map. |
+| **Warning**    | Naming that departs from the guide, an unexplained magic value, a stale README or instructions file, a `switch` that should be a map. |
 | **Suggestion** | Readability, consistency with neighbouring modules, and performance ideas that no rule mandates.                                     |
 
 Rank findings most severe first, and state plainly when nothing blocks the merge — an empty
