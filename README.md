@@ -29,7 +29,7 @@ A game trainer for **3D Pinball for Windows - Space Cadet** (`pinball.exe`) buil
 
 - Object Pascal (Borland Delphi 7)
 - Windows API (`ReadProcessMemory`, `WriteProcessMemory`, `OpenProcess`, `CreateRemoteThread`, `VirtualAllocEx`, `CreateToolHelp32SnapShot`)
-- x86 inline assembly (for API function hooking via JMP patches)
+- Runtime code patching (API function hooking via 5-byte JMP patches written directly over each function's entry point)
 - DLL injection (`LoadLibraryA` via remote thread)
 - AlphaControls component suite (skinned UI controls)
 
@@ -44,7 +44,7 @@ pinball-trainer-plus/
 ├── SpeedHack/
 │   ├── SpeedHack.dpr          # DLL project file (speed hack library)
 │   ├── SpeedHack.res          # DLL compiled resources
-│   └── USpeedHack.pas         # Speed hack implementation (API hooking, timing override)
+│   └── USpeedHack.pas         # Unused inline-assembly variant of the speed hack
 ├── Resources/
 │   ├── SpeedHack.res          # Embedded SpeedHack.dll resource
 │   └── Installer.res          # Embedded Pinball installer resource
@@ -79,7 +79,7 @@ The speed hack works by injecting a DLL into the pinball process that replaces t
 
 ### Trainer-DLL communication
 
-The trainer and injected DLL communicate through shared memory addresses. The DLL reads the trainer's `SpeedHackSpeed`, `SpeedHackSleep`, and `SpeedHackActiv` variables by finding the trainer window (`TFrmPTPPrincipal`) and reading its process memory at fixed offsets.
+The trainer and injected DLL communicate through shared memory addresses. The DLL reads the trainer's `SpeedHackSpeed`, `SpeedHackSleep`, and `SpeedHackActiv` variables by finding the trainer window (`TFrmPTPPrincipal`) and reading its process memory at hard-coded addresses.
 
 ## Installation
 
@@ -91,11 +91,12 @@ The trainer and injected DLL communicate through shared memory addresses. The DL
 
 ### Building
 
-1. Open `PTP.dpr` in Delphi 7
-2. Build the SpeedHack DLL: open `SpeedHack/SpeedHack.dpr` and compile
-3. Build the main application: compile `PTP.dpr`
+1. Build the SpeedHack DLL: open `SpeedHack/SpeedHack.dpr` in Delphi 7 and compile
+2. Build the main application: open `PTP.dpr` and compile
 
-Alternatively, use the `Clear.bat` script to remove build artifacts before a clean rebuild.
+The trainer links the committed `Resources/SpeedHack.res`, so a rebuilt DLL is only picked up once that resource is regenerated from it.
+
+Use `Clear.bat` (root) and `SpeedHack/Clear.bat` to remove Delphi intermediate files before a clean rebuild.
 
 ## Contributing
 

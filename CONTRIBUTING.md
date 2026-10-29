@@ -11,7 +11,7 @@ This project was built using the following tools and technologies:
 - **IDE:** Borland Delphi 7
 - **UI Components:** AlphaControls component suite (skinned UI)
 - **Windows API:** `ReadProcessMemory`, `WriteProcessMemory`, `OpenProcess`, `CreateRemoteThread`, `VirtualAllocEx`
-- **DLL Injection:** x86 inline assembly for API function hooking via JMP patches
+- **DLL Injection:** `CreateRemoteThread` + `LoadLibraryA`; the injected DLL hooks timing APIs with 5-byte JMP patches written directly over each function's entry point
 
 ### Build Steps (Historical)
 

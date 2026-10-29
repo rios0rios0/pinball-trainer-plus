@@ -1,0 +1,3 @@
+kind: 'Changed'
+body: 'refreshed `AGENTS.md`, `.github/copilot-instructions.md`, `README.md`, and `CONTRIBUTING.md` to document the `checks.yaml` workflow, what `Clear.bat` actually deletes, the committed `Resources/SpeedHack.res` the trainer links, the DLL''s hard-coded addresses into the trainer, the Windows-1252 encoding of `UPTP.pas`, and the direct-pointer JMP patching that replaced the inline-assembly claim'
+time: '2026-10-29T00:17:42.579429653Z'

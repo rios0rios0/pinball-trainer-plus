@@ -4,7 +4,7 @@
 
 **Pinball Trainer Plus** is a game trainer for **3D Pinball for Windows - Space Cadet** (`pinball.exe`). Built with Object Pascal in Borland Delphi 7, it reads and writes the game's process memory in real time to modify score, ball count, flipper force, cheat flags, and game speed. A companion DLL implements a speed hack by hooking three Windows timing APIs at runtime, patching the first 5 bytes of each with a `JMP` to custom replacement functions. Development was discontinued on 2013-03-28 and the repository is preserved as a historical reference.
 
-**ALWAYS** reference these instructions first and fall back to searching or reading source files only when you encounter information that does not match what is documented here.
+Use these notes for orientation; where they and the source files disagree, the source files are current.
 
 ## Working Effectively
 
@@ -21,41 +21,47 @@ There is no automated build system or package manager. Builds are done manually 
 1. Open `SpeedHack/SpeedHack.dpr` in Delphi 7 and compile to produce `SpeedHack.dll`
 2. Open `PTP.dpr` in Delphi 7 and compile to produce the trainer executable
 
-Run `Clear.bat` to remove all Delphi build artifacts (`.obj`, `.dcu`, `.exe`, etc.) before a clean rebuild.
+Run `Clear.bat` in the root and `SpeedHack/Clear.bat` in `SpeedHack/` to remove Delphi IDE and compiler intermediates (`.dcu`, `.~??` backups, `.cfg`, `.dof`, `.dsk`, etc.) before a clean rebuild; neither deletes the built `.exe` or `.dll`.
 
-There is no automated test suite. CI in `.github/workflows/` delegates to `rios0rios0/pipelines`: `release.yaml` tags releases, and `claude-review.yaml` / `claude-mention.yaml` run Claude PR review and `@claude` mention responses.
+`UPTP.pas` links the committed `Resources/SpeedHack.res`, not the freshly compiled `SpeedHack.dll`, so a DLL change reaches the trainer only after that resource is rebuilt.
+
+There is no automated test suite. CI in `.github/workflows/` delegates to `rios0rios0/pipelines`: `checks.yaml` runs the shared pull-request checks, `release.yaml` tags releases, and `claude-review.yaml` / `claude-mention.yaml` run Claude PR review and `@claude` mention responses.
 
 ## Repository Structure
 
 ```
 pinball-trainer-plus/
+├── .changes/
+│   └── unreleased/                # chlog fragments; CHANGELOG.md is generated from them
 ├── .github/
 │   ├── copilot-instructions.md    # This file
 │   ├── skills/
 │   │   └── code-review/
 │   │       └── SKILL.md           # Copilot code-review skill tailored to this repo
 │   └── workflows/
+│       ├── checks.yaml            # Pull-request checks (delegates to rios0rios0/pipelines)
 │       ├── release.yaml           # Release tagging (delegates to rios0rios0/pipelines)
 │       ├── claude-review.yaml     # Claude automated PR review
 │       └── claude-mention.yaml    # @claude mention responder
 ├── .gitignore
-├── CLAUDE.md                      # Claude Code guidance
+├── AGENTS.md                      # Instructions shared by every coding agent
+├── CLAUDE.md                      # Imports AGENTS.md for Claude Code
 ├── PTP.dpr                        # Main application entry point (Delphi project file)
 ├── PTP.res                        # Compiled project resources
 ├── UPTP.pas                       # Main form unit — trainer logic, memory R/W, DLL injection
 ├── UPTP.dfm                       # Main form visual layout (Delphi Form Designer file)
 ├── SpeedHack/
-│   ├── Clear.bat                  # Cleanup script for SpeedHack build artifacts
-│   ├── SpeedHack.dpr              # Speed hack DLL project file
+│   ├── Clear.bat                  # Cleanup script for SpeedHack build intermediates
+│   ├── SpeedHack.dpr              # Speed hack DLL (full implementation)
 │   ├── SpeedHack.res              # DLL compiled resources
-│   └── USpeedHack.pas             # Speed hack implementation (API hooking, timing override)
+│   └── USpeedHack.pas             # Unused inline-asm variant (referenced by neither project)
 ├── Resources/
 │   ├── SpeedHack.res              # Embedded SpeedHack.dll resource (linked into the EXE)
 │   └── Installer.res              # Embedded Pinball installer resource
 ├── Imgs/
 │   └── Icon.ico                   # Application icon
 ├── CHANGELOG.md
-├── Clear.bat                       # Cleanup script for Delphi build artifacts
+├── Clear.bat                       # Cleanup script for Delphi build intermediates
 ├── CONTRIBUTING.md
 ├── LICENSE
 └── README.md
@@ -66,7 +72,7 @@ pinball-trainer-plus/
 | File | Purpose |
 |---|---|
 | `UPTP.pas` | All trainer logic: process detection, memory read/write, DLL injection, UI event handlers, freeze timers |
-| `USpeedHack.pas` | Unused alternative speed hack implementation (the inline x86 `asm` variant; not referenced by either project) |
+| `SpeedHack/USpeedHack.pas` | Unused alternative speed hack implementation (the inline x86 `asm` variant; not referenced by either project) |
 | `PTP.dpr` | Application entry point; references `UPTP` and links resources |
 | `SpeedHack/SpeedHack.dpr` | Speed hack DLL: full implementation including API hooking via 5-byte `JMP` patches (direct pointer writes, no inline asm), trainer IPC, and timing loop |
 | `UPTP.dfm` | Delphi form layout — edit in the Delphi IDE form designer |
@@ -94,7 +100,7 @@ The entire trainer is implemented as a single VCL form class `TFrmPTPPrincipal`.
 - **Memory read/write** — `WriteMemoryBytes()` wraps the read-base / add-offset / `WriteProcessMemory` sequence; there is no `ReadMemoryBytes` helper — reads for display are done inline with `ReadProcessMemory` in `TmrAtualizaTimer`. Pointer chains are followed by reading a base address and adding a fixed offset (e.g. score: base `$01025040` + offset `$52`).
 - **Freeze timers** — `TmrFreezePontos` and `TmrFreezeBolas` continuously rewrite the desired score/ball-count values to prevent the game from changing them.
 - **DLL injection** — `InjectDll()` extracts `SpeedHack.dll` from embedded resources via `CreateResource()`, allocates memory in the target process with `VirtualAllocEx`, writes the DLL path with `WriteProcessMemory`, and creates a remote thread that calls `LoadLibraryA`.
-- **Trainer–DLL communication** — After injection, the DLL finds the trainer's window (`TFrmPTPPrincipal`) and reads three variables from the trainer's own process memory at fixed offsets: `SpeedHackSpeed` (acceleration multiplier), `SpeedHackSleep` (thread sleep interval), `SpeedHackActiv` (active flag).
+- **Trainer–DLL communication** — After injection, the DLL finds the trainer's window (`TFrmPTPPrincipal`) and reads three variables from hard-coded absolute addresses in the trainer's own process memory: `SpeedHackSpeed` (acceleration multiplier), `SpeedHackSleep` (thread sleep interval), `SpeedHackActiv` (active flag). Renaming the form class, or any change that moves those globals in the compiled trainer, breaks the speed hack.
 
 ### Speed Hack DLL (`SpeedHack.dpr`)
 
@@ -124,7 +130,7 @@ All builds are performed manually inside the Delphi 7 IDE. There are no command-
 |---|---|
 | Build SpeedHack DLL | Open `SpeedHack/SpeedHack.dpr` → **Project › Compile** |
 | Build trainer EXE | Open `PTP.dpr` → **Project › Compile** |
-| Clean build artifacts | Run `Clear.bat` from a command prompt |
+| Clean build intermediates | Run `Clear.bat` in the root and `SpeedHack/Clear.bat` in `SpeedHack/` |
 
 Typical build time: **< 30 seconds** for each project on a Windows machine.
 
@@ -146,7 +152,8 @@ There is no automated test suite. Validation is done manually:
 - **Variables** — use `PascalCase` or `camelCase` (e.g. `PHandle`, `SpeedHackSpeed`, `CETick64`).
 - **UI controls** — AlphaControls-skinned controls are prefixed with `s` (e.g. `sTrckbr1`, `sChkFreezeBolas`, `sEdtSpeed`).
 - **Procedures/functions** — `PascalCase` verbs (e.g. `GetProcessIDbyName`, `InjectDll`, `WriteMemoryBytes`).
-- **Language mix** — UI labels are in Portuguese (pt-BR); comments and documentation are in English.
+- **Language mix** — the original identifiers, comments, and UI strings mix Portuguese (pt-BR) and English; leave them as they are. New documentation is in English.
+- **Encoding** — `UPTP.pas` is Windows-1252, not UTF-8; saving it as UTF-8 corrupts the Portuguese UI strings.
 - **Resource directives** — use `{$R *.res}` and `{$R Resources\SpeedHack.res}` to link compiled resources.
 - **Error handling** — wrap memory operations in `try…except` blocks; do not let unhandled exceptions propagate to the user.
 - **Hard-coded addresses** — memory addresses are stored as `DWORD` constants in hexadecimal (e.g. `$01025040`). Document any new addresses in a comment explaining what they point to.
@@ -168,11 +175,11 @@ Because this project is discontinued, changes should be limited to documentation
 
 | Task | How |
 |---|---|
-| Change a memory address | Update the relevant constant in `UPTP.pas` and update the table in `README.md` |
+| Change a memory address | Update the relevant constant in `UPTP.pas` and the matching address in the Features list of `README.md` |
 | Add a new freeze target | Add a new timer in the VCL form, hook it to `WriteMemoryBytes` calls |
 | Update the speed hack | Edit `SpeedHack/SpeedHack.dpr`, recompile it, re-embed the resulting DLL into `Resources/SpeedHack.res` |
 | Replace the bundled installer | Rebuild `Resources/Installer.res` from the new installer binary |
-| Remove build artifacts | Run `Clear.bat` |
+| Remove build intermediates | Run `Clear.bat` and `SpeedHack/Clear.bat` |
 
 ## Troubleshooting
 

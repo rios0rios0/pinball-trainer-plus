@@ -1,10 +1,10 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents (Claude Code, Codex, Cursor, GitHub Copilot) when working with code in this repository.
 
 ## Project
 
-Pinball Trainer Plus is a discontinued (2013) game trainer for 3D Pinball for Windows - Space Cadet. Built with Object Pascal in Borland Delphi 7. No automated builds or tests. CI in `.github/workflows/` delegates to `rios0rios0/pipelines`: `release.yaml` tags releases, while `claude-review.yaml` and `claude-mention.yaml` run Claude PR review and `@claude` mention responses.
+Pinball Trainer Plus is a discontinued (2013) game trainer for 3D Pinball for Windows - Space Cadet. Built with Object Pascal in Borland Delphi 7. No automated builds or tests. CI in `.github/workflows/` delegates to `rios0rios0/pipelines`: `checks.yaml` runs the shared pull-request checks, `release.yaml` tags releases, and `claude-review.yaml` and `claude-mention.yaml` run Claude PR review and `@claude` mention responses.
 
 ## Build
 
@@ -13,25 +13,20 @@ All builds are manual in the Delphi 7 IDE:
 1. Compile `SpeedHack/SpeedHack.dpr` first (produces `SpeedHack.dll`)
 2. Compile `PTP.dpr` (produces the trainer executable)
 
-Run `Clear.bat` (root) or `SpeedHack/Clear.bat` to remove build artifacts.
+`UPTP.pas` embeds the committed `Resources/SpeedHack.res`, not the freshly built DLL: a change to `SpeedHack.dpr` reaches the trainer only after that resource is rebuilt from the new DLL.
+
+Run `Clear.bat` (root) and `SpeedHack/Clear.bat` to remove IDE and compiler intermediates (`.dcu`, `.~??`, `.cfg`, `.dof`, …); neither deletes the built `.exe` or `.dll`.
 
 ## Architecture
 
-Single-form VCL app (`UPTP.pas`) + injected DLL (`SpeedHack/SpeedHack.dpr`).
+Single-form VCL app (`UPTP.pas`) that reads and writes `pinball.exe` memory, plus a DLL (`SpeedHack/SpeedHack.dpr`) the trainer injects into the game to hook its timing APIs. `SpeedHack/USpeedHack.pas` is an unused inline-`asm` variant referenced by neither project.
 
-- **Process detection** — polls for `pinball.exe` via `CreateToolHelp32SnapShot`; finds window by class `1c7c22a0-9576-11ce-bf80-444553540000`
-- **Memory R/W** — `ReadProcessMemory`/`WriteProcessMemory` with pointer chains (base `$01025040`)
-- **DLL injection** — extracts DLL from embedded resources, injects via `VirtualAllocEx` + `CreateRemoteThread` + `LoadLibraryA`
-- **Speed hack** — DLL patches first 5 bytes of `GetTickCount`, `timeGetTime`, `QueryPerformanceCounter` with JMP to custom replacements
-- **Trainer-DLL IPC** — DLL reads trainer's `SpeedHackSpeed`, `SpeedHackSleep`, `SpeedHackActiv` variables from fixed memory offsets
+The DLL finds the trainer by its window class `TFrmPTPPrincipal` and reads `SpeedHackSpeed`, `SpeedHackSleep`, and `SpeedHackActiv` from hard-coded absolute addresses in the trainer's process (procedure `Speed` in `SpeedHack.dpr`). Renaming the form class, or any change that moves those globals in the compiled trainer, breaks the speed hack.
 
 ## Conventions
 
-- Type prefix `T` (e.g. `TFrmPTPPrincipal`)
-- Constants in `SCREAMING_SNAKE_CASE`
-- UI control names prefixed with `s` (AlphaControls)
-- UI labels in Portuguese (pt-BR); code and docs in English
-- Memory addresses as `DWORD` hex constants
+- The original identifiers, comments, and UI strings mix Portuguese (pt-BR) and English; leave them as they are. Write new documentation in English.
+- `UPTP.pas` is Windows-1252, not UTF-8; edit it in a way that keeps that encoding.
 - Conventional commits (e.g. `chore:`, `fix:`)
 
 ## Prerequisites
