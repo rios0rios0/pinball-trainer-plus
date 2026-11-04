@@ -22,6 +22,13 @@ Exceptions are acceptable depending on the circumstances (critical bug fixes tha
 
 ## [Unreleased]
 
+## [1.4.2] - 2026-11-04
+
+### Changed
+
+- moved the agent instructions from `CLAUDE.md` to `AGENTS.md`, keeping a `CLAUDE.md` that imports it, and pointed the `code-review` skill at `AGENTS.md`
+- refreshed `AGENTS.md`, `.github/copilot-instructions.md`, `README.md`, and `CONTRIBUTING.md` to document the `checks.yaml` workflow, what `Clear.bat` actually deletes, the committed `Resources/SpeedHack.res` the trainer links, the DLL's hard-coded addresses into the trainer, the Windows-1252 encoding of `UPTP.pas`, and the direct-pointer JMP patching that replaced the inline-assembly claim
+
 ## [1.4.1] - 2026-09-08
 
 ### Changed
